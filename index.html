@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ar" dir="rtl" manifest="cache.appcache">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<title>عالم الالكترونيات | Electronic World</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:#03070d;color:#fff}
+body{min-height:100vh;position:relative;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;background:url("background.png") center/cover no-repeat;z-index:-3}
+body:after{content:"";position:fixed;inset:0;background:
+ radial-gradient(circle at 50% 35%,rgba(0,145,255,.20),transparent 42%),
+ linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.82));z-index:-2}
+.glow{position:fixed;inset:auto 0 0;height:25vh;background:linear-gradient(transparent,rgba(0,102,255,.10));pointer-events:none}
+header{padding:18px 20px;text-align:center;background:rgba(3,8,15,.62);border-bottom:1px solid rgba(30,156,255,.35);backdrop-filter:blur(8px)}
+.brand{display:inline-flex;align-items:center;gap:10px}
+.brand img{width:42px;height:42px;border-radius:12px;box-shadow:0 0 20px rgba(0,145,255,.45)}
+.brand strong{font-size:clamp(20px,4vw,30px);text-shadow:0 0 16px rgba(0,150,255,.55)}
+main{width:min(920px,92vw);margin:clamp(50px,11vh,110px) auto 30px;text-align:center}
+.panel{padding:34px 24px;border:1px solid rgba(0,157,255,.55);border-radius:24px;background:rgba(3,10,18,.72);box-shadow:0 20px 70px rgba(0,0,0,.55),0 0 35px rgba(0,117,255,.13);backdrop-filter:blur(10px)}
+.logoTitle{font-size:clamp(38px,8vw,78px);font-weight:900;margin:0;letter-spacing:-2px;background:linear-gradient(#fff,#8bd5ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 28px rgba(0,150,255,.28)}
+.subtitle{font-size:clamp(17px,3vw,26px);font-weight:700;margin:12px 0 7px}
+.desc{color:#aebdca;margin:0 auto 25px;font-size:15px}
+.status{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:rgba(0,80,150,.20);border:1px solid rgba(0,160,255,.35);color:#dff4ff}
+.dot{width:10px;height:10px;border-radius:50%;background:#2aa8ff;box-shadow:0 0 16px #2aa8ff;animation:pulse 1.1s infinite}
+@keyframes pulse{50%{opacity:.35;transform:scale(.75)}}
+#state{margin-top:12px;font-size:14px;color:#9fb2c3}
+.contacts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:28px}
+.contact{min-width:230px;padding:12px 18px;border-radius:14px;background:rgba(7,16,27,.85);border:1px solid rgba(0,157,255,.28)}
+.contact b{display:block;font-size:17px}.contact span{color:#82cfff;font-weight:700;direction:ltr;display:block;margin-top:3px}
+.address{margin-top:12px;color:#dbe8f3}
+@media(max-width:600px){.panel{padding:27px 15px}.contacts{gap:8px}.contact{min-width:100%}}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<header>
+  <div class="brand">
+    <img src="icon.png" alt="عالم الالكترونيات">
+    <strong>عالم الالكترونيات</strong>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h1 class="logoTitle">عالم الالكترونيات</h1>
+    <div class="subtitle">ورشة متخصصة لصيانة أجهزة الألعاب</div>
+    <p class="desc">PS5 · PS4 · XBOX &nbsp; | &nbsp; صيانة · إصلاح · برمجة · تحديث</p>
+
+    <div class="status"><i class="dot"></i><span>جاري فحص الجهاز وتجهيز الصفحة...</span></div>
+    <div id="state">يرجى الانتظار</div>
+
+    <div class="contacts">
+      <div class="contact"><b>محمد خالد</b><span>07705361282</span></div>
+      <div class="contact"><b>حمزة البغدادي</b><span>07703548449</span></div>
+    </div>
+    <div class="address">📍 ديالى / خانقين — شارع الحسينية الكبيرة</div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var state=document.getElementById("state");
+  var params=new URLSearchParams(location.search);
+
+  var SUPPORTED={1302:1,1304:1,1350:1,1352:1};
+  var key=null,fwnum=null;
+  var m=/PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(navigator.userAgent);
+  if(m){
+    var ms=parseInt(m[2],16).toString(16);
+    if(ms.length<2) ms="0"+ms;
+    key=m[1]+"."+ms;
+    fwnum=parseInt(m[1],10)*100+parseInt(ms,10);
+  }
+
+  var forced=params.get("force")==="1";
+  var supported=forced || (fwnum!==null && SUPPORTED[fwnum]===1);
+  var target="jb.html"+location.search;
+
+  function go(){
+    state.textContent="جاري تشغيل الجلبريك...";
+    location.replace(target);
+  }
+  function waitForTap(msg,action){
+    state.textContent=msg;
+    function fire(){
+      window.removeEventListener("click",fire);
+      window.removeEventListener("keydown",fire);
+      action();
+    }
+    window.addEventListener("click",fire);
+    window.addEventListener("keydown",fire);
+  }
+
+  if(!supported){
+    state.textContent="الإصدار غير مدعوم تلقائياً: "+(key||"غير معروف")+" — اضغط للدخول";
+    waitForTap("اضغط X أو المس الشاشة للمتابعة",go);
+    return;
+  }
+
+  var ac=window.applicationCache;
+  if(!ac || !document.documentElement.hasAttribute("manifest")){
+    go();
+  }else if(!navigator.onLine){
+    state.textContent="الوضع المحلي: جاري التشغيل من الذاكرة المؤقتة...";
+    go();
+  }else if(ac.status===ac.IDLE){
+    state.textContent="الملفات جاهزة — جاري التشغيل...";
+    go();
+  }else if(ac.status===ac.UPDATEREADY){
+    try{ac.swapCache()}catch(e){}
+    waitForTap("تحديث جاهز — اضغط X أو المس الشاشة لإعادة التحميل",function(){location.reload()});
+  }else{
+    state.textContent="جاري تجهيز الملفات للعمل بدون إنترنت...";
+    ac.addEventListener("cached",function(){
+      waitForTap("اكتمل التخزين — اضغط X أو المس الشاشة للتشغيل",go);
+    },false);
+    ac.addEventListener("noupdate",go,false);
+    ac.addEventListener("updateready",function(){
+      try{ac.swapCache()}catch(e){}
+      waitForTap("تحديث جاهز — اضغط X أو المس الشاشة لإعادة التحميل",function(){location.reload()});
+    },false);
+    ac.addEventListener("error",function(){
+      waitForTap("تعذر تحديث الذاكرة — اضغط X أو المس الشاشة للتشغيل",go);
+    },false);
+  }
+})();
+</script>
+</body>
+</html>
